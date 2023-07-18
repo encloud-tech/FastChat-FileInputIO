@@ -161,31 +161,37 @@ def share_click(state0, state1, model_selector0, model_selector1, request: gr.Re
 
 
 SAMPLING_WEIGHTS = {
-    "gpt-4": 1.5,
-    "gpt-3.5-turbo": 1.5,
-    "claude-2": 1.5,
-    "claude-instant-1": 1.5,
+    # tire 0
+    "gpt-4": 1.8,
+    "gpt-3.5-turbo": 1.8,
+    "claude-2": 1.8,
+    "claude-instant-1": 1.8,
+    "llama-2-13b-chat": 1.8,
+    "vicuna-33b": 1.8,
+    "vicuna-13b": 1.8,
+    "mpt-30b-chat": 1.8,
+    # tire 1
     "palm-2": 1.5,
-    "vicuna-33b": 1.5,
-    "vicuna-13b": 1.5,
     "wizardlm-13b": 1.5,
     "guanaco-33b": 1.5,
-    "koala-13b": 1.2,
-    "vicuna-7b": 1.2,
-    "mpt-7b-chat": 1.2,
-    "mpt-30b-chat": 1.2,
-    "gpt4all-13b-snoozy": 1.2,
-    "oasst-pythia-12b": 1.2,
-    "RWKV-4-Raven-14B": 1.2,
-    "fastchat-t5-3b": 0.9,
-    "alpaca-13b": 0.9,
-    "chatglm-6b": 0.8,
+    "vicuna-7b": 1.5,
+    "llama-2-7b-chat": 1.5,
+    # tire 2
+    "koala-13b": 1.0,
+    "mpt-7b-chat": 1.0,
+    "gpt4all-13b-snoozy": 1.0,
+    "oasst-pythia-12b": 1.0,
+    "RWKV-4-Raven-14B": 1.0,
+    "fastchat-t5-3b": 0.5,
+    "alpaca-13b": 0.5,
+    "chatglm-6b": 0.5,
+    # tire 3
     "stablelm-tuned-alpha-7b": 0.1,
     "dolly-v2-12b": 0.1,
     "llama-13b": 0.1,
 }
 
-SAMPLING_BOOST_MODELS = []
+SAMPLING_BOOST_MODELS = ["llama-2-13b-chat", "llama-2-7b-chat", "claude-2"]
 
 model_pairs = []
 model_pairs_weights = []
@@ -214,7 +220,7 @@ def add_text(
                     b = models[j]
                     w = SAMPLING_WEIGHTS.get(a, 1.0) * SAMPLING_WEIGHTS.get(b, 1.0)
                     if a in SAMPLING_BOOST_MODELS or b in SAMPLING_BOOST_MODELS:
-                        w *= 5
+                        w *= 10
                     model_pairs.append((a, b))
                     model_pairs_weights.append(w)
 
