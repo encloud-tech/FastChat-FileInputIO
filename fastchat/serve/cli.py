@@ -221,6 +221,10 @@ if __name__ == "__main__":
         choices=["simple", "rich", "programmatic"],
         help="Display style.",
     )
+     parser.add_argument(
+        "--input-file", type=str, default=None,
+        help="Path to the file containing chat input messages.",
+    )
     parser.add_argument(
         "--multiline",
         action="store_true",
