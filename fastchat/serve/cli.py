@@ -173,7 +173,9 @@ def main(args):
     elif args.style == "rich":
         chatio = RichChatIO(args.multiline, args.mouse)
     elif args.style == "programmatic":
-        chatio = FileInputChatIO(args.input_file)
+        input_prompt_file = "input_prompt.txt"
+        input_file_path = os.path.abspath(input_prompt_file)
+        chatio = FileInputChatIO(input_file_path)
     else:
         raise ValueError(f"Invalid style for console: {args.style}")
     try:
@@ -220,10 +222,6 @@ if __name__ == "__main__":
         default="simple",
         choices=["simple", "rich", "programmatic"],
         help="Display style.",
-    )
-    parser.add_argument(
-        "--input-file", type=str, default=None,
-        help="Path to the file containing chat input messages.",
     )
     parser.add_argument(
         "--multiline",
