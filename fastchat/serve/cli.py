@@ -173,9 +173,11 @@ def main(args):
     elif args.style == "rich":
         chatio = RichChatIO(args.multiline, args.mouse)
     elif args.style == "programmatic":
-        input_prompt_file = "input_prompt.txt"
-        input_file_path = os.path.abspath(input_prompt_file)
-        chatio = FileInputChatIO(input_file_path)
+        input_file_name = "input_prompt.txt" 
+        inputs_directory = "inputs"  
+        root_input_file = os.path.join(inputs_directory, input_file_name)
+        root_input_file_path = os.path.abspath(root_input_file)
+        chatio = FileInputChatIO(root_input_file_path)
     else:
         raise ValueError(f"Invalid style for console: {args.style}")
     try:
