@@ -58,8 +58,15 @@ class SimpleChatIO(ChatIO):
             if now > pre:
                 print(" ".join(output_text[pre:now]), end=" ", flush=True)
                 pre = now
-        print(" ".join(output_text[pre:]), flush=True)
-        return " ".join(output_text)
+        # print(" ".join(output_text[pre:]), flush=True)
+        # return " ".join(output_text)
+        relevant_output.append(" ".join(output_text[pre:]))
+        self._stored_output = " ".join(output_text)  # Store the entire output in the variable
+
+        return self._stored_output
+
+    def get_relevant_output(self) -> str:
+        return self._stored_output
 
 
 class RichChatIO(ChatIO):
