@@ -66,7 +66,7 @@ class SimpleChatIO(ChatIO):
                 line = self.chat_websocket_client()
             except EOFError as e:
                 break
-        return "\n".join(prompt_data)
+            return "\n".join(prompt_data)
     
 
     
