@@ -59,12 +59,12 @@ class SimpleChatIO(ChatIO):
         prompt_data = []
         # line = input(f"{role} [ctrl-d/z on empty line to end]: ")
         # line = self.receive_input_from_websocket(role + f" [ctrl-d/z on empty line to end]: ")
-        # line = self.chat_websocket_client(role + f" [ctrl-d/z on empty line to end]: ")
-        line = await self.websocket.recv()
+        line = self.chat_websocket_client(role + f" [ctrl-d/z on empty line to end]: ")
+        # line = await self.websocket.recv()
         while True:
             prompt_data.append(line.strip())
             try:
-                line = await self.websocket.recv()
+                line = self.chat_websocket_client()
             except EOFError as e:
                 break
         return "\n".join(prompt_data)
@@ -73,7 +73,7 @@ class SimpleChatIO(ChatIO):
     def prompt_for_output(self, role: str):
         print(f"{role}: ", end="", flush=True)
 
-    def stream_output(self, output_stream):
+    async def stream_output(self, output_stream):
         pre = 0
         for outputs in output_stream:
             output_text = outputs["text"]
@@ -83,6 +83,7 @@ class SimpleChatIO(ChatIO):
                 print(" ".join(output_text[pre:now]), end=" ", flush=True)
                 pre = now
         print(" ".join(output_text[pre:]), flush=True)
+        await websockets.send(" ".join(output_text[pre:]))
         return " ".join(output_text)
 
 
