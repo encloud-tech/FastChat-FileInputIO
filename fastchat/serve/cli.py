@@ -248,11 +248,11 @@ async def main(args):
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
-    loop.close()
     parser = argparse.ArgumentParser()
     add_model_args(parser)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main(args=parser.parse_args()))
+    loop.close()
     parser.add_argument(
         "--conv-template", type=str, default=None, help="Conversation prompt template."
     )
