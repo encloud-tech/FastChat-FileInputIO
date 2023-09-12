@@ -206,7 +206,7 @@ async def main(args):
         os.environ["XPU_VISIBLE_DEVICES"] = args.gpus
 
     if args.style == "simple":
-        websocket = await websockets.connect("ws://your-proxy-server-address")
+        websocket = await websockets.connect("wss://35.209.170.184:8080/ws")
         chatio = SimpleChatIO(websocket,args.multiline)
     elif args.style == "rich":
         chatio = RichChatIO(args.multiline, args.mouse)
