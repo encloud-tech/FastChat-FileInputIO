@@ -22,29 +22,51 @@ from prompt_toolkit.key_binding import KeyBindings
 from rich.console import Console
 from rich.live import Live
 from rich.markdown import Markdown
+import asyncio
+import websockets
 
 from fastchat.model.model_adapter import add_model_args
 from fastchat.modules.gptq import GptqConfig
 from fastchat.serve.inference import ChatIO, chat_loop
 
 
+# async def chatbot_websocket_client():
+#     uri = "ws://your-golang-websocket-server-address/ws"
+#     async with websockets.connect(uri) as websocket:
+#         while True:
+#             user_input = await websocket.recv()
+#             response = "User Input we got" + user_input
+#             print(response)
+#             print(user_input)
+#             # This will further relay the message to WebSocket Gin Sentinel Server.
+#             await websocket.send(response)
+
 class SimpleChatIO(ChatIO):
-    def __init__(self, multiline: bool = False):
+    def __init__(self, websocket, multiline: bool = False):
         self._multiline = multiline
+        self.websocket = websocket
 
     def prompt_for_input(self, role) -> str:
         if not self._multiline:
             return input(f"{role}: ")
 
         prompt_data = []
-        line = input(f"{role} [ctrl-d/z on empty line to end]: ")
+        # line = input(f"{role} [ctrl-d/z on empty line to end]: ")
+        line = self.receive_input_from_websocket(role + f" [ctrl-d/z on empty line to end]: ")
         while True:
             prompt_data.append(line.strip())
             try:
-                line = input()
+                line = self.receive_input_from_websocket()
             except EOFError as e:
                 break
         return "\n".join(prompt_data)
+    
+    async def receive_input_from_websocket(self,prompt=None)-> str:
+        if prompt:
+            self.send_message_to_websocket(prompt)
+        user_input = await self.websocket.recv()  # Receive input from WebSocket client
+        print(user_input)
+        return user_input
 
     def prompt_for_output(self, role: str):
         print(f"{role}: ", end="", flush=True)
@@ -159,7 +181,22 @@ class FileInputChatIO(ChatIO):
         return " ".join(output_text)
 
 
-def main(args):
+# async def chatbot_websocket_client():
+#     # URI to Point to the Proxy WebSocket Gin Server so that it can relay the message:
+#     uri = "wss://VM_PUBLIC_IP:8080/ws"
+#     async with websockets.connect() as websocket:
+#         while True:
+#             user_input = await websocket.recv()
+#             response = "User Input we got" + user_input
+#             print(response)
+#             print(user_input)
+#             # This will further relay the message to WebSocket Gin Sentinel Server.
+#             await websocket.send(response)
+
+
+async def main(args):
+    # First of all we retrieve the Event Loop
+    # asyncio.get_event_loop().run_until_complete(chatbot_websocket_client())
     if args.gpus:
         if len(args.gpus.split(",")) < args.num_gpus:
             raise ValueError(
@@ -169,7 +206,8 @@ def main(args):
         os.environ["XPU_VISIBLE_DEVICES"] = args.gpus
 
     if args.style == "simple":
-        chatio = SimpleChatIO(args.multiline)
+        websocket = await websockets.connect("ws://your-proxy-server-address")
+        chatio = SimpleChatIO(websocket,args.multiline)
     elif args.style == "rich":
         chatio = RichChatIO(args.multiline, args.mouse)
     elif args.style == "programmatic":
@@ -180,6 +218,7 @@ def main(args):
         chatio = FileInputChatIO(root_input_file_path)
     else:
         raise ValueError(f"Invalid style for console: {args.style}")
+
     try:
         chat_loop(
             args.model_path,
