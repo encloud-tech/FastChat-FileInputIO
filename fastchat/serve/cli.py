@@ -59,7 +59,7 @@ class SimpleChatIO(ChatIO):
         prompt_data = []
         # line = input(f"{role} [ctrl-d/z on empty line to end]: ")
         # line = self.receive_input_from_websocket(role + f" [ctrl-d/z on empty line to end]: ")
-        line = self.chat_websocket_client()
+        line = self.chat_websocket_client(role + f" [ctrl-d/z on empty line to end]: ")
         while True:
             prompt_data.append(line.strip())
             try:
