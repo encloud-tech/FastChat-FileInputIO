@@ -30,16 +30,16 @@ from fastchat.modules.gptq import GptqConfig
 from fastchat.serve.inference import ChatIO, chat_loop
 
 
-async def chatbot_websocket_client():
-    uri = "ws://your-golang-websocket-server-address/ws"
-    async with websockets.connect(uri) as websocket:
-        while True:
-            user_input = await websocket.recv()
-            response = "User Input we got" + user_input
-            print(response)
-            print(user_input)
-            # This will further relay the message to WebSocket Gin Sentinel Server.
-            await websocket.send(response)
+# async def chatbot_websocket_client():
+#     uri = "ws://your-golang-websocket-server-address/ws"
+#     async with websockets.connect(uri) as websocket:
+#         while True:
+#             user_input = await websocket.recv()
+#             response = "User Input we got" + user_input
+#             print(response)
+#             print(user_input)
+#             # This will further relay the message to WebSocket Gin Sentinel Server.
+#             await websocket.send(response)
 
 class SimpleChatIO(ChatIO):
     def __init__(self, websocket, multiline: bool = False):
@@ -49,7 +49,7 @@ class SimpleChatIO(ChatIO):
     async def chat_websocket_client()-> str:
         # URI to Point to the Proxy WebSocket Gin Server so that it can relay the message:
      uri = "wss://35.209.170.184:8080/ws"
-     async with websockets.connect() as websocket:
+     async with websockets.connect(uri) as websocket:
         while True:
             user_input = await websocket.recv()
             response = "User Input we got" + user_input
@@ -76,12 +76,12 @@ class SimpleChatIO(ChatIO):
                 break
         return "\n".join(prompt_data)
     
-    async def receive_input_from_websocket(self,prompt=None)-> str:
-        if prompt:
-            self.send_message_to_websocket(prompt)
-        user_input = await self.websocket.recv()  # Receive input from WebSocket client
-        print(user_input)
-        return user_input
+    # async def receive_input_from_websocket(self,prompt=None)-> str:
+    #     if prompt:
+    #         self.send_message_to_websocket(prompt)
+    #     user_input = await self.websocket.recv()  # Receive input from WebSocket client
+    #     print(user_input)
+    #     return user_input
 
     def prompt_for_output(self, role: str):
         print(f"{role}: ", end="", flush=True)
@@ -198,7 +198,7 @@ class FileInputChatIO(ChatIO):
 
 def main(args):
     # First of all we retrieve the Event Loop
-    asyncio.get_event_loop().run_until_complete(chatbot_websocket_client())
+    asyncio.get_event_loop().run_until_complete(SimpleChatIO.chat_websocket_client())
     if args.gpus:
         if len(args.gpus.split(",")) < args.num_gpus:
             raise ValueError(
