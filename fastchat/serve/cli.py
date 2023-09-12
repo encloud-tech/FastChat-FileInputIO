@@ -30,16 +30,16 @@ from fastchat.modules.gptq import GptqConfig
 from fastchat.serve.inference import ChatIO, chat_loop
 
 
-# async def chatbot_websocket_client():
-#     uri = "ws://your-golang-websocket-server-address/ws"
-#     async with websockets.connect(uri) as websocket:
-#         while True:
-#             user_input = await websocket.recv()
-#             response = "User Input we got" + user_input
-#             print(response)
-#             print(user_input)
-#             # This will further relay the message to WebSocket Gin Sentinel Server.
-#             await websocket.send(response)
+async def chatbot_websocket_client():
+    uri = "ws://your-golang-websocket-server-address/ws"
+    async with websockets.connect(uri) as websocket:
+        while True:
+            user_input = await websocket.recv()
+            response = "User Input we got" + user_input
+            print(response)
+            print(user_input)
+            # This will further relay the message to WebSocket Gin Sentinel Server.
+            await websocket.send(response)
 
 class SimpleChatIO(ChatIO):
     def __init__(self, websocket, multiline: bool = False):
@@ -206,7 +206,7 @@ async def main(args):
         os.environ["XPU_VISIBLE_DEVICES"] = args.gpus
 
     if args.style == "simple":
-        websocket = await websockets.connect("wss://35.209.170.184:8080/ws")
+        websocket = await websockets.connect("ws://your-proxy-server-address")
         chatio = SimpleChatIO(websocket,args.multiline)
     elif args.style == "rich":
         chatio = RichChatIO(args.multiline, args.mouse)
@@ -250,9 +250,6 @@ async def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     add_model_args(parser)
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(args=parser.parse_args()))
-    loop.close()
     parser.add_argument(
         "--conv-template", type=str, default=None, help="Conversation prompt template."
     )
