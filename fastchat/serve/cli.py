@@ -46,17 +46,32 @@ class SimpleChatIO(ChatIO):
         self._multiline = multiline
         self.websocket = websocket
 
+    async def chat_websocket_client()-> str:
+        # URI to Point to the Proxy WebSocket Gin Server so that it can relay the message:
+     uri = "wss://35.209.170.184:8080/ws"
+     async with websockets.connect() as websocket:
+        while True:
+            user_input = await websocket.recv()
+            response = "User Input we got" + user_input
+            print(response)
+            print(user_input)
+            # This will further relay the message to WebSocket Gin Sentinel Server.
+            # await websocket.send(response)
+            return response
+
+
     def prompt_for_input(self, role) -> str:
         if not self._multiline:
             return input(f"{role}: ")
 
         prompt_data = []
         # line = input(f"{role} [ctrl-d/z on empty line to end]: ")
-        line = self.receive_input_from_websocket(role + f" [ctrl-d/z on empty line to end]: ")
+        # line = self.receive_input_from_websocket(role + f" [ctrl-d/z on empty line to end]: ")
+        line = self.chat_websocket_client()
         while True:
             prompt_data.append(line.strip())
             try:
-                line = self.receive_input_from_websocket()
+                line = self.chat_websocket_client()
             except EOFError as e:
                 break
         return "\n".join(prompt_data)
@@ -181,22 +196,9 @@ class FileInputChatIO(ChatIO):
         return " ".join(output_text)
 
 
-# async def chatbot_websocket_client():
-#     # URI to Point to the Proxy WebSocket Gin Server so that it can relay the message:
-#     uri = "wss://VM_PUBLIC_IP:8080/ws"
-#     async with websockets.connect() as websocket:
-#         while True:
-#             user_input = await websocket.recv()
-#             response = "User Input we got" + user_input
-#             print(response)
-#             print(user_input)
-#             # This will further relay the message to WebSocket Gin Sentinel Server.
-#             await websocket.send(response)
-
-
 def main(args):
     # First of all we retrieve the Event Loop
-    # asyncio.get_event_loop().run_until_complete(chatbot_websocket_client())
+    asyncio.get_event_loop().run_until_complete(chatbot_websocket_client())
     if args.gpus:
         if len(args.gpus.split(",")) < args.num_gpus:
             raise ValueError(
