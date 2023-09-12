@@ -83,7 +83,7 @@ class SimpleChatIO(ChatIO):
                 print(" ".join(output_text[pre:now]), end=" ", flush=True)
                 pre = now
         print(" ".join(output_text[pre:]), flush=True)
-        await websockets.send(" ".join(output_text[pre:]))
+        # await websockets.send(" ".join(output_text[pre:]))
         return " ".join(output_text)
 
 
