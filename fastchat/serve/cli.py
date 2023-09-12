@@ -13,6 +13,7 @@ import argparse
 import os
 import re
 import sys
+import ssl
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -30,16 +31,7 @@ from fastchat.modules.gptq import GptqConfig
 from fastchat.serve.inference import ChatIO, chat_loop
 
 
-# async def chatbot_websocket_client():
-#     uri = "ws://your-golang-websocket-server-address/ws"
-#     async with websockets.connect(uri) as websocket:
-#         while True:
-#             user_input = await websocket.recv()
-#             response = "User Input we got" + user_input
-#             print(response)
-#             print(user_input)
-#             # This will further relay the message to WebSocket Gin Sentinel Server.
-#             await websocket.send(response)
+
 
 class SimpleChatIO(ChatIO):
     def __init__(self, websocket, multiline: bool = False):
@@ -49,7 +41,7 @@ class SimpleChatIO(ChatIO):
     async def chat_websocket_client()-> str:
         # URI to Point to the Proxy WebSocket Gin Server so that it can relay the message:
      uri = "wss://35.209.170.184:8080/ws"
-     async with websockets.connect(uri) as websocket:
+     async with websockets.connect(uri, ssl=ssl.SSLContext()) as websocket:
         while True:
             user_input = await websocket.recv()
             response = "User Input we got" + user_input
@@ -76,12 +68,6 @@ class SimpleChatIO(ChatIO):
                 break
         return "\n".join(prompt_data)
     
-    # async def receive_input_from_websocket(self,prompt=None)-> str:
-    #     if prompt:
-    #         self.send_message_to_websocket(prompt)
-    #     user_input = await self.websocket.recv()  # Receive input from WebSocket client
-    #     print(user_input)
-    #     return user_input
 
     def prompt_for_output(self, role: str):
         print(f"{role}: ", end="", flush=True)
