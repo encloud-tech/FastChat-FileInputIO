@@ -48,7 +48,7 @@ class SimpleChatIO(ChatIO):
             print(response)
             print(user_input)
             # This will further relay the message to WebSocket Gin Sentinel Server.
-            # await websocket.send(response)
+            await websocket.send(response)
             return response
 
 
