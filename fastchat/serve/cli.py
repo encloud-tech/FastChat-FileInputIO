@@ -52,14 +52,15 @@ class SimpleChatIO(ChatIO):
             return response
 
 
-    def prompt_for_input(self, role) -> str:
+    async def prompt_for_input(self, role) -> str:
         if not self._multiline:
             return input(f"{role}: ")
 
         prompt_data = []
         # line = input(f"{role} [ctrl-d/z on empty line to end]: ")
         # line = self.receive_input_from_websocket(role + f" [ctrl-d/z on empty line to end]: ")
-        line = self.chat_websocket_client(role + f" [ctrl-d/z on empty line to end]: ")
+        # line = self.chat_websocket_client(role + f" [ctrl-d/z on empty line to end]: ")
+        line = await self.websocket.recv()
         while True:
             prompt_data.append(line.strip())
             try:
