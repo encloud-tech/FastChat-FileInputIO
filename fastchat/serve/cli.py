@@ -49,7 +49,7 @@ class SimpleChatIO(ChatIO):
             print(user_input)
             # This will further relay the message to WebSocket Gin Sentinel Server.
             await websocket.send(response)
-            return response
+            # return response
 
 
     def prompt_for_input(self, role) -> str:
