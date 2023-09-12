@@ -49,7 +49,7 @@ class SimpleChatIO(ChatIO):
             print(user_input)
             # This will further relay the message to WebSocket Gin Sentinel Server.
             await websocket.send(response)
-            # return response
+            return response
 
 
     def prompt_for_input(self, role) -> str:
@@ -66,9 +66,7 @@ class SimpleChatIO(ChatIO):
                 line = self.chat_websocket_client()
             except EOFError as e:
                 break
-            return "\n".join(prompt_data)
-    
-
+        return "\n".join(prompt_data)
     
 
     def prompt_for_output(self, role: str):
