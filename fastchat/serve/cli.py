@@ -194,7 +194,7 @@ class FileInputChatIO(ChatIO):
 #             await websocket.send(response)
 
 
-async def main(args):
+def main(args):
     # First of all we retrieve the Event Loop
     # asyncio.get_event_loop().run_until_complete(chatbot_websocket_client())
     if args.gpus:
@@ -206,7 +206,7 @@ async def main(args):
         os.environ["XPU_VISIBLE_DEVICES"] = args.gpus
 
     if args.style == "simple":
-        websocket = await websockets.connect("ws://your-proxy-server-address")
+        websocket =  websockets.connect("ws://your-proxy-server-address")
         chatio = SimpleChatIO(websocket,args.multiline)
     elif args.style == "rich":
         chatio = RichChatIO(args.multiline, args.mouse)
