@@ -42,7 +42,7 @@ class SimpleChatIO(ChatIO):
         # URI to Point to the Proxy WebSocket Gin Server so that it can relay the message:
      uri = "wss://35.209.170.184:8080/ws"
      async with websockets.connect(uri, ssl=ssl.SSLContext()) as websocket:
-        while True:
+        # while True:
             try:
                 user_input = await websocket.recv()
                 response = "User Input we got" + user_input
