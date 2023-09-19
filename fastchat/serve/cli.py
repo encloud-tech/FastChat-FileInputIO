@@ -38,29 +38,35 @@ class SimpleChatIO(ChatIO):
         self._multiline = multiline
         self.websocket = websocket
 
-    async def chat_websocket_client()-> str:
+    async def chat_websocket_client(self)-> str:
         # URI to Point to the Proxy WebSocket Gin Server so that it can relay the message:
      uri = "wss://35.209.170.184:8080/ws"
      async with websockets.connect(uri, ssl=ssl.SSLContext()) as websocket:
         while True:
-            user_input = await websocket.recv()
-            response = "User Input we got" + user_input
-            print(response)
-            print(user_input)
-            # This will further relay the message to WebSocket Gin Sentinel Server.
-            await websocket.send(response)
-            # return response
+            try:
+                user_input = await websocket.recv()
+                response = "User Input we got" + user_input
+                print(response)
+                print(user_input)
+                await websocket.send(response)
+                task = asyncio.create_task(self.prompt_for_input("USER"))
+                return user_input
+            except websockets.exceptions.ConnectionClosed:
+                print("Connection Closed")
+           
+
+            
 
 
-    def prompt_for_input(self, role) -> str:
+    async def prompt_for_input(self, role) -> str:
         if not self._multiline:
             return input(f"{role}: ")
 
         prompt_data = []
         # line = input(f"{role} [ctrl-d/z on empty line to end]: ")
         # line = self.receive_input_from_websocket(role + f" [ctrl-d/z on empty line to end]: ")
-        line = self.chat_websocket_client(role + f" [ctrl-d/z on empty line to end]: ")
-        while True:
+        line = await self.chat_websocket_client()
+        while line:
             prompt_data.append(line.strip())
             try:
                 line = self.chat_websocket_client()
@@ -184,7 +190,7 @@ class FileInputChatIO(ChatIO):
 
 def main(args):
     # First of all we retrieve the Event Loop
-    asyncio.get_event_loop().run_until_complete(SimpleChatIO.chat_websocket_client())
+    # asyncio.get_event_loop().run_until_complete(SimpleChatIO.chat_websocket_client())
     if args.gpus:
         if len(args.gpus.split(",")) < args.num_gpus:
             raise ValueError(
@@ -196,6 +202,8 @@ def main(args):
     if args.style == "simple":
         websocket =  websockets.connect("wss://35.209.170.184:8080/ws")
         chatio = SimpleChatIO(websocket,args.multiline)
+        # asyncio.get_event_loop().run_until_complete(SimpleChatIO.chat_websocket_client())
+        asyncio.run(chatio.chat_websocket_client())
     elif args.style == "rich":
         chatio = RichChatIO(args.multiline, args.mouse)
     elif args.style == "programmatic":
