@@ -59,8 +59,8 @@ class SimpleChatIO(ChatIO):
 
 
     async def prompt_for_input(self, role) -> str:
-        if not self._multiline:
-            return input(f"{role}: ")
+        # if not self._multiline:
+        #     return input(f"{role}: ")
 
         prompt_data = []
         # line = input(f"{role} [ctrl-d/z on empty line to end]: ")
